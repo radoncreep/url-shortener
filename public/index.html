@@ -10,5 +10,20 @@
     <header>
         <h1>rcc.sh - Short urls for your code garden</h1>
     </header>
+    <main id="app">
+        <form @submit.prevent="createUrl()">
+            <label for="url">Url</label>
+            <input v-model="url" name="url" id="url">
+             
+            <label for="slug">Slug</label>
+            <input v-model="slug" name="slug" id="slug">
+            <button type="submit">Create</button>
+        </form>
+
+        <pre>
+            {{JSON.stringify(created, null, 2)}}
+        </pre>
+    </main>
+    <script src="https://unpkg.com/vue@2.6.11/dist/vue.js"></script>
 </body>
 </html>
