@@ -9,6 +9,7 @@ const cors = require('cors');
 const yup = require('yup');
 const monk = require('monk');
 const { nanoid } = require('nanoid');
+const bodyParser = require('body-parser');
 
 require('dotenv').config();
 
@@ -20,19 +21,33 @@ urls.createIndex({ slug: 1 }, { unique: 1 });
 
 const app = express();
 
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
+
 // Midddlewares
 app.use(morgan('tiny')); // Logger
 app.use(helmet()); // Minimal security
 app.use(cors()); // Cross-Origin protection
-app.use(express.json()); // Json body parser
-app.use(express.static(path.join(__dirname, './public'))); 
+// app.use(express.json()); // Json body parser
+app.use(express.static(path.join(__dirname, './views'))); 
+app.use(bodyParser.urlencoded({ extended: false }))
+// app.use(express.static(path.join(__dirname, './public'))); 
+
 
 // Routes
+
+app.get('/', (req, res, next) => {
+    res.render('index', {
+        path: 'index',
+        pageTitle: 'rccUrlshortener'
+    });
+})
 app.get('/:id', async (req, res, next) => {
     // TODO: redirect to url
-    const { id: slug } = req.params;
+    const id = req.params.id;
     try {
-        const url = await urls.findOne({ slug });
+        const url = await urls.findOne({ id });
         if (url) {
             console.log(url.url + ' iono what this is ????');
             res.redirect(url.url)
@@ -52,7 +67,13 @@ const schema = yup.object().shape({
 
 app.post('/url', async (req, res, next) => {
     // TODO: create a short url
-    let { slug, url } = req.body;
+    // let { slug, url } = req.body;
+    let url = req.body.url;
+    let slug = req.body.slug;
+    
+    console.log(url + ' url');
+    console.log(slug + ' slug');
+
 
     try {
         await schema.validate({
